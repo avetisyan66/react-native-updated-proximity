@@ -1,4 +1,3 @@
-
 package com.RNProximity;
 
 import java.util.Arrays;

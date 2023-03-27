@@ -1,4 +1,3 @@
-
 package com.RNProximity;
 
 import android.content.Context;
@@ -6,8 +5,10 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.support.annotation.Nullable;
+import android.os.PowerManager;
 import android.util.Log;
+
+import androidx.annotation.Nullable;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -26,37 +27,52 @@ public class RNProximityModule extends ReactContextBaseJavaModule implements Sen
   private static final String KEY_PROXIMITY = "proximity";
   private static final String KEY_DISTANCE = "distance";
   private static final String KEY_EVENT_ON_SENSOR_CHANGE = "EVENT_ON_SENSOR_CHANGE";
-  private static final String EVENT_ON_SENSOR_CHANGE = "onSensorChanged";
+  private static final String EVENT_ON_SENSOR_CHANGE = "ProximityStateDidChange";
   private final ReactApplicationContext reactContext;
 
   private SensorManager mSensorManager;
   private Sensor mProximity;
+  private PowerManager mPowerManager;
+  private PowerManager.WakeLock mWakeLock;
 
   public RNProximityModule(ReactApplicationContext reactContext) {
     super(reactContext);
     this.reactContext = reactContext;
-    mSensorManager = (SensorManager) reactContext.getSystemService(Context.SENSOR_SERVICE);
+    mSensorManager = (SensorManager)reactContext.getSystemService(Context.SENSOR_SERVICE);
     mProximity = mSensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
+    mPowerManager = (PowerManager)this.reactContext.getSystemService(ReactApplicationContext.POWER_SERVICE);
   }
 
-  public void sendEvent(String eventName, @Nullable WritableMap params) {
-    if (this.reactContext.hasActiveCatalystInstance()) {
-      this.reactContext
-              .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-              .emit(eventName, params);
-    } else {
-      Log.i(TAG, "Waiting for CatalystInstance");
+  public void turnOnScreen(){
+    // turn on screen
+    if (mWakeLock != null && mWakeLock.isHeld()){
+      mWakeLock.release();
     }
   }
 
-  @ReactMethod
-  public void addListener() {
-    mSensorManager.registerListener(this, mProximity, SensorManager.SENSOR_DELAY_NORMAL);
+  public void turnOffScreen(){
+    // turn off screen
+    if (mWakeLock == null){
+      mWakeLock = mPowerManager.newWakeLock(PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK, "contagt:tag");
+    }
+    if (!mWakeLock.isHeld()){
+      mWakeLock.acquire();
+    }
+  }
+
+  public void sendEvent(String eventName, @Nullable WritableMap params) {
+    this.reactContext
+            .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+            .emit(eventName, params);
   }
 
   @ReactMethod
-  public void removeListener() {
-    mSensorManager.unregisterListener(this);
+  public void proximityEnabled(boolean enabled) {
+    if (enabled){
+      mSensorManager.registerListener(this, mProximity, SensorManager.SENSOR_DELAY_NORMAL);
+    } else {
+      mSensorManager.unregisterListener(this);
+    }
   }
 
   @Override
@@ -79,6 +95,12 @@ public class RNProximityModule extends ReactContextBaseJavaModule implements Sen
     double maximumRange = mProximity.getMaximumRange();
     boolean isNearDevice = distance < maximumRange;
 
+    if (isNearDevice) {
+      turnOffScreen();
+    } else {
+      turnOnScreen();
+    }
+
     params.putBoolean(KEY_PROXIMITY, isNearDevice);
     params.putDouble(KEY_DISTANCE, distance);
 
@@ -88,5 +110,15 @@ public class RNProximityModule extends ReactContextBaseJavaModule implements Sen
   @Override
   public void onAccuracyChanged(Sensor sensor, int i) {
 
+  }
+
+  @ReactMethod
+  public void addListener(String eventName) {
+    // Keep: Required for RN built in Event Emitter Calls.
+  }
+
+  @ReactMethod
+  public void removeListeners(Integer count) {
+    // Keep: Required for RN built in Event Emitter Calls.
   }
 }

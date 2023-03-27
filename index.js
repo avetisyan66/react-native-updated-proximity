@@ -1,41 +1,28 @@
-'use strict';
+import { NativeEventEmitter, NativeModules } from 'react-native';
 
-import {
-  DeviceEventEmitter,
-  NativeModules,
-  Platform,
-} from 'react-native';
+const { RNProximity } = NativeModules;
 
-const nativeModule = NativeModules.RNProximity;
+const RNProximityEmitter = new NativeEventEmitter(RNProximity);
 
-let addListener = null;
-let removeListener = null;
+const addListener = (callback) => {
+  RNProximity.proximityEnabled(true);
+  return RNProximityEmitter.addListener('ProximityStateDidChange', callback);
+};
+const removeListener = (eventSubscription) => {
+  RNProximity.proximityEnabled(false);
+  eventSubscription.remove();
+};
 
-if (Platform.OS === 'ios') {
-  addListener = function(callback) {
-    NativeModules.RNProximity.proximityEnabled(true);
-    return DeviceEventEmitter.addListener(
-      'proximityStateDidChange', callback
-    );
-  },
-  removeListener = function(listener) {
-    NativeModules.RNProximity.proximityEnabled(false);
-    DeviceEventEmitter.removeAllListeners(
-      'proximityStateDidChange', listener
-    );
-  }
-} else if (Platform.OS == 'android') {
-  addListener = (callback) => {
-    nativeModule.addListener();
-    DeviceEventEmitter.addListener(nativeModule.EVENT_ON_SENSOR_CHANGE, e => callback(e));
-  };
-  removeListener = (listener) => {
-    nativeModule.removeListener();
-    DeviceEventEmitter.removeAllListeners(nativeModule.EVENT_ON_SENSOR_CHANGE, listener);
-  };
-}
+const removeAllListeners = () => {
+  RNProximity.proximityEnabled(false);
+  RNProximityEmitter.removeAllListeners('ProximityStateDidChange');
+};
 
-module.exports = {
-  addListener,
-  removeListener,
+let campaign = null;
+
+export default Proximity = {
+  campaign: campaign,
+  addListener : addListener,
+  removeListener: removeListener,
+  removeAllListeners: removeAllListeners
 };
