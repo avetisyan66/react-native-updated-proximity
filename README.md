@@ -9,7 +9,7 @@ This project is based on the react-native-proximity library. So unfortunately th
 
 ![](https://github.com/williambout/react-native-proximity/raw/master/demo.gif)
 
-*Usage of react-native-proximity and scrollview.*
+*Usage of react-native-updated-proximity and scrollview.*
 
 ## Getting Started
 
@@ -54,7 +54,7 @@ Or if you're writing in TypeScript first you have to create a file for Proximity
 // name the files as react-native-updated-proximity.d.ts
 // add this code in your file and then you can use that in your component
 
-declare module 'react-native-proximity' {
+declare module 'react-native-updated-proximity' {
     const proximity: {
         addListener(callback: (data: { Proximity: boolean }) => void): void;
         removeListener(callback: (data: { Proximity: boolean }) => void): void;
