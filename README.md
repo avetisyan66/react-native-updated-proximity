@@ -35,15 +35,15 @@ The callback function returns an object with *proximity* and *distance* properti
 Use this way:
 
 ```javascript
-import {useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 
 const [isNear, setIsNear] = useState(false);
 
 const callback = ({ proximity }) => setIsNear(!!proximity);
 
 useEffect(() => {
-  Proximity.addListener(proximityListener);
-  return  () => removeListener(calback)
+  Proximity.addListener(calback);
+  return  () => Proximity.removeListener(calback);
 }, []);
 ```
 
