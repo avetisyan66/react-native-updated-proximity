@@ -1,5 +1,5 @@
 {
-  "name": "react-native-proximity",
+  "name": "react-native-updated-proximity",
   "version": "3.0.2",
   "description": "Detect proximity on iOS and Android",
   "main": "index.js",
@@ -16,10 +16,10 @@
     "native",
     "proximity"
   ],
-  "author": "William Bout <hello@williambout.me> (https://github.com/williambout)",
+  "author": "Ani Avetisyan <avetisyanani6@gmail.com> (https://github.com/avetisyan66)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/williambout/react-native-proximity/issues"
+    "url": "https://github.com/avetisyan66/react-native-updated-proximity/issues"
   },
-  "homepage": "https://github.com/williambout/react-native-proximity"
+  "homepage": "https://github.com/avetisyan66/react-native-updated-proximity"
 }
