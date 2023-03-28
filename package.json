@@ -1,6 +1,6 @@
 {
   "name": "react-native-updated-proximity",
-  "version": "3.0.2",
+  "version": "3.0.3",
   "description": "Detect proximity on iOS and Android",
   "main": "index.js",
   "scripts": {
