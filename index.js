@@ -1,4 +1,4 @@
-import { NativeEventEmitter, NativeModules } from 'react-native';
+import { NativeEventEmitter, NativeModules } from "react-native";
 
 const { RNProximity } = NativeModules;
 
@@ -6,23 +6,25 @@ const RNProximityEmitter = new NativeEventEmitter(RNProximity);
 
 const addListener = (callback) => {
   RNProximity.proximityEnabled(true);
-  return RNProximityEmitter.addListener('ProximityStateDidChange', callback);
+  return RNProximityEmitter.addListener("ProximityStateDidChange", callback);
 };
 const removeListener = (eventSubscription) => {
   RNProximity.proximityEnabled(false);
-  eventSubscription.remove();
+  if (eventSubscription.remove) {
+    eventSubscription.remove();
+  }
 };
 
 const removeAllListeners = () => {
   RNProximity.proximityEnabled(false);
-  RNProximityEmitter.removeAllListeners('ProximityStateDidChange');
+  RNProximityEmitter.removeAllListeners("ProximityStateDidChange");
 };
 
 let campaign = null;
 
 export default Proximity = {
   campaign: campaign,
-  addListener : addListener,
+  addListener: addListener,
   removeListener: removeListener,
-  removeAllListeners: removeAllListeners
+  removeAllListeners: removeAllListeners,
 };
